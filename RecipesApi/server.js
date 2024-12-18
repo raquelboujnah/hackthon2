@@ -21,7 +21,4 @@ app.listen(PORT, () => {
 app.use(cors());
 
 app.use("/recipes", recipeRouter);
-async function getVersion() {
-  const result = await db.raw("select version()");
-  console.log(result.rows);
-}
+

@@ -3,7 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Homepage</title>    
   </head>
-  <body></body>
+  <style>
+    ul{
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    #searchbar{
+      display: flex;
+    }
+    #navbar{
+      background-color: pink;
+      height: 100px;
+    }
+    .onerecipe{
+      border: 2px solid black;
+      width: 300px;
+      height: 400px;
+    }
+
+    #allrecipes{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    img{
+      width: 300px;
+      height: 200px;
+    }
+  </style>
+
+  <body>
+
+    
+      <section id="navbar">
+        
+        <ul>
+          <h2>Recipes Blog</h2>
+          <li><a href='#'>My recipes</a></li>
+          <li><a href="#">My favorites</a></li>
+          <div id="searchbar">
+          <input type="text">
+          <button>Search</button>
+        </div>
+        </ul>
+      </section>
+
+      <section id="allrecipes">
+        
+      </section>
+    
+
+
+
+
+    <script src="./js/homepage.js"></script>
+  </body>
 </html>

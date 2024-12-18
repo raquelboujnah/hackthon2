@@ -40,13 +40,14 @@ const getRecipeByID = async(req, res) => {
 }
 
 const postRecipe = async(req, res) => {
-    const {username, title, description, is_vegan, picture_url } = req.body
+    const {username, title, description, is_vegan, picture_url, ingredients} = req.body
     const recipe = {
         username,
         title,
         description,
         is_vegan,
-        picture_url
+        picture_url,
+        ingredients
     }
     try {
         const response = await postRecipeDB(recipe)
@@ -58,8 +59,8 @@ const postRecipe = async(req, res) => {
 }
 
 const updateRecipe = async (req,res)=> {
-    const {recipe_id, title, description, is_vegan, picture_url} = req.body
-    const updatedRecipe = {recipe_id, title, description, is_vegan, picture_url}
+    const {recipe_id, title, description, is_vegan, picture_url, ingredients} = req.body
+    const updatedRecipe = {recipe_id, title, description, is_vegan, picture_url, ingredients}
     try {
         const response = await updateRecipeDB(updatedRecipe)
         res.json({message : 'The recipe has been successfully updated!'})
