@@ -3,7 +3,6 @@ async function getAllRecipes() {
         const response = await fetch ('http://localhost:3000/recipes')
         const data = await response.json()
         renderRecipes(data)
-        console.log(data)
     } catch (error) {
         console.log(error)
     }
@@ -30,6 +29,26 @@ function renderRecipes(arr){
         }
     })
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const userData = localStorage.getItem("user");
+
+    if (!userData) {
+      window.location.href = "/login.html";
+    } else {
+      const user = JSON.parse(userData);
+
+      const welcomeMessage = document.getElementById("welcome-message");
+      welcomeMessage.textContent = `Welcome, ${user.username}!`;
+    }
+  });
+
+  const logoutButton = document.getElementById("logout-btn");
+  logoutButton.addEventListener("click", () => {
+    localStorage.removeItem("user");
+    window.location.href = "/login.html";
+  });
 
 
 

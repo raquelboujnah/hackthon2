@@ -1,0 +1,27 @@
+ul{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  #searchbar{
+    display: flex;
+  }
+  #navbar{
+    background-color: pink;
+    height: 100px;
+  }
+  .onerecipe{
+    border: 2px solid black;
+    width: 300px;
+    height: 400px;
+  }
+
+  #allrecipes{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  img{
+    width: 300px;
+    height: 200px;
+  }

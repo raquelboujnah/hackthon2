@@ -29,7 +29,6 @@ const getRecipesByUsername = async (req, res) => {
 
 const getRecipeByID = async(req, res) => {
     const {id} = req.params
-    console.log(id)
     try {
         const response = await getRecipeByIDDB(id)
         res.json(response)
