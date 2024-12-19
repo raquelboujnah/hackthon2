@@ -9,11 +9,11 @@ const register = async (req, res) => {
     const existingUser = await authModel.findUserByEmail(email);
 
     if (existingUser) {
-      return res.status(400).send("Email already exists");
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     if (existingUsername) {
-      return res.status(400).send("Username already exists");
+      return res.status(400).json({ message: "Username already exists" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await authModel.registerUser({
@@ -26,7 +26,7 @@ const register = async (req, res) => {
     res.status(201).redirect("/login.html");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Server error while saving");
+    res.status(500).json({ message: "Server error while saving" });
   }
 };
 
@@ -36,16 +36,26 @@ const login = async (req, res) => {
   try {
     const user = await authModel.findUserByUsername(username);
     if (!user) {
-      return res.status(401).send("Error: Incorrect username");
+      return res.status(401).json({ message: "Invalid username or password" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).send("Error: Incorrect password");
+      return res.status(401).json({ message: "Invalid username or password" });
     }
-    res.redirect("/homepage.html");
+    const favoriteRecipes = await authModel.findFavoritesByUsername(username);
+    return res.json({
+      user_id: user.user_id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      username: user.username,
+      favoriteRecipes: favoriteRecipes,
+    });
   } catch (error) {
     console.error("Error connecting: ", error);
-    res.status(500).send("Server error: unable to connect.");
+    res
+      .status(500)
+      .json({ message: "An error occurred on the server. Please try again." });
   }
 };
 

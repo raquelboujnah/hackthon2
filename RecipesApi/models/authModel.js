@@ -12,4 +12,16 @@ const findUserByEmail = async (email) => {
   return db("users").where({ email }).first();
 };
 
-module.exports = { registerUser, findUserByUsername, findUserByEmail };
+const findFavoritesByUsername = async (username) => {
+  const favorites = await db("favoriterecipes")
+    .where({ username })
+    .select("recipe_id");
+  return favorites.map((fav) => fav.recipe_id);
+};
+
+module.exports = {
+  registerUser,
+  findUserByUsername,
+  findUserByEmail,
+  findFavoritesByUsername,
+};
