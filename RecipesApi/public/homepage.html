@@ -9,26 +9,6 @@
     <h1 id="welcome-message"></h1>
     <div id="user-info"></div>
     <button id="logout-btn">Logout</button>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const userData = localStorage.getItem("user");
-
-        if (!userData) {
-          window.location.href = "/login.html";
-        } else {
-          const user = JSON.parse(userData);
-
-          const welcomeMessage = document.getElementById("welcome-message");
-          welcomeMessage.textContent = `Welcome, ${user.username}!`;
-        }
-      });
-
-      const logoutButton = document.getElementById("logout-btn");
-      logoutButton.addEventListener("click", () => {
-        localStorage.removeItem("user");
-        window.location.href = "/login.html";
-      });
-    </script>
   <style>
     ul{
       display: flex;
@@ -57,11 +37,21 @@
       width: 300px;
       height: 200px;
     }
+    .like-heart {
+  font-size: 27px;
+  color: gray;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+  .like-heart.liked {
+    color: red;
+    transform: scale(1.3);
+}
   </style>
 
   <body>
 
-    
       <section id="navbar">
         
         <ul>
@@ -69,8 +59,7 @@
           <li><a href='#'>My recipes</a></li>
           <li><a href="#">My favorites</a></li>
           <div id="searchbar">
-          <input type="text">
-          <button>Search</button>
+          <input id="search" type="text" placeholder="Search recipe, ingredient, user..." >
         </div>
         </ul>
       </section>
@@ -79,10 +68,6 @@
         
       </section>
     
-
-
-
-
     <script src="./js/homepage.js"></script>
   </body>
 </html>
