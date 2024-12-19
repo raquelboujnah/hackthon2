@@ -113,83 +113,80 @@ function displayRecipe(recipe) {
   });
 }
 
-<<<<<<< HEAD
 getTheRecipe();
-=======
-getTheRecipe()
-
 
 async function loadComments(recipeId) {
-    try {
-      const response = await fetch(`/comments/${recipeId}`);
-      const data = await response.json();
-      console.log(data)
+  try {
+    const response = await fetch(`/comments/${recipeId}`);
+    const data = await response.json();
+    console.log(data);
 
-      if (response.ok) {
-        const commentsList = document.getElementById("comments-list");
-        commentsList.innerHTML = "";
+    if (response.ok) {
+      const commentsList = document.getElementById("comments-list");
+      commentsList.innerHTML = "";
 
-        data.comments.forEach((comment) => {
-          const commentElement = document.createElement("div");
-          commentElement.classList.add("comment");
-          const formattedDate = moment(comment.created_at).format('ddd, MMM D, YYYY, h:mm A');
-          commentElement.innerHTML = `
+      data.comments.forEach((comment) => {
+        const commentElement = document.createElement("div");
+        commentElement.classList.add("comment");
+        const formattedDate = moment(comment.created_at).format(
+          "ddd, MMM D, YYYY, h:mm A"
+        );
+        commentElement.innerHTML = `
       <p><strong>${comment.username}</strong> says:</p>
       <p>${comment.content}</p>
       <p><em>Posted on ${formattedDate}</em></p>
     `;
-          commentsList.appendChild(commentElement);
-        });
+        commentsList.appendChild(commentElement);
+      });
+    } else {
+      console.error("Failed to load comments:", data.message);
+    }
+  } catch (err) {
+    console.error("Error loading comments:", err);
+  }
+}
+
+document
+  .getElementById("comment-form")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const commentContent = document
+      .getElementById("comment-content")
+      .value.trim();
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!commentContent) {
+      alert("Please write a comment.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/comments/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipe_id: recipeId,
+          user_id: user.user_id,
+          content: commentContent,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Comment added successfully!");
+        document.getElementById("comment-content").value = "";
+        loadComments(recipeId);
       } else {
-        console.error("Failed to load comments:", data.message);
+        alert("Error: " + data.message);
       }
     } catch (err) {
-      console.error("Error loading comments:", err);
+      console.error("Error while posting comment:", err);
+      alert("Server error. Please try again.");
     }
-  }
+  });
 
-  document
-    .getElementById("comment-form")
-    .addEventListener("submit", async function (event) {
-      event.preventDefault();
-
-      const commentContent = document
-        .getElementById("comment-content")
-        .value.trim();
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      if (!commentContent) {
-        alert("Please write a comment.");
-        return;
-      }
-
-      try {
-        const response = await fetch("/comments/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            recipe_id: recipeId,
-            user_id: user.user_id,
-            content: commentContent,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          alert("Comment added successfully!");
-          document.getElementById("comment-content").value = "";
-          loadComments(recipeId);
-        } else {
-          alert("Error: " + data.message);
-        }
-      } catch (err) {
-        console.error("Error while posting comment:", err);
-        alert("Server error. Please try again.");
-      }
-    });
-
-  loadComments(recipeId); 
->>>>>>> 2478b7afdbc383809a50c80f7126435d5907b66c
+loadComments(recipeId);
