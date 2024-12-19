@@ -17,4 +17,6 @@ router.post("/", postRecipe);
 router.put("/", updateRecipe);
 router.delete("/:id", deleteRecipe);
 
-module.exports = router;
+module.exports = {
+    recipeRouter : router
+};

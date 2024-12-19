@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const recipeRoutes = require("./routes/recipeRoute.js");
+const {recipeRouter} = require("./routes/recipeRoute.js");
 const path = require("path");
 const app = express();
 const authRoute = require("./routes/authRoute.js");
@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRoute);
 app.use("/comments", commentRoutes);
-app.use("/recipes", recipeRoutes);
+app.use("/recipes", recipeRouter);
 const PORT = 3000;
 
 app.listen(PORT, () => {
