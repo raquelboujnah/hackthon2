@@ -18,3 +18,7 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Listenning on port ${PORT}`);
 });
+
+app.use(cors());
+
+app.use("/recipes", recipeRouter);
