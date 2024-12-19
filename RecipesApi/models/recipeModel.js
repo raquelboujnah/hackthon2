@@ -20,8 +20,17 @@ const getRecipeByIDDB = (id) => {
 const postRecipeDB = (recipe) => {
     const {username, title, description, is_vegan, picture_url, ingredients } = recipe
 
-    return db('recipes')
-    .insert({username, title, description, is_vegan, picture_url, ingredients }, ['recipe_id', 'username', 'title', 'description', 'is_vegan', 'picture_url ', 'ingredients'])
+    return db('recipes').insert(
+        {
+            username,
+            title,
+            description: JSON.stringify(description), // Convert array to JSON string
+            is_vegan,
+            picture_url,
+            ingredients: JSON.stringify(ingredients), // Convert array to JSON string
+        },
+        ['recipe_id', 'username', 'title', 'description', 'is_vegan', 'picture_url', 'ingredients']
+    );
 
 }
 
@@ -29,7 +38,15 @@ const updateRecipeDB = (recipe) => {
     const {recipe_id, title, description, is_vegan, picture_url, ingredients } = recipe
 
     return db('recipes')
-    .update({title, description, is_vegan, picture_url, ingredients}, ['recipe_id', 'username', 'title', 'description', 'is_vegan', 'picture_url ', 'ingredients'])
+    .update(
+        {
+            title, 
+            description : JSON.stringify(description),
+            is_vegan,
+            picture_url, 
+            ingredients : JSON.stringify(ingredients)
+        }, 
+            ['recipe_id', 'username', 'title', 'description', 'is_vegan', 'picture_url ', 'ingredients'])
     .where({recipe_id})
 
 }
