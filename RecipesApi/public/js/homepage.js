@@ -1,24 +1,20 @@
+const user = JSON.parse(localStorage.getItem('user'));
+const { username } = user;
+
 document.addEventListener("DOMContentLoaded", () => {
   const userData = localStorage.getItem("user");
-  async function getAllRecipes() {
-    try {
-      const response = await fetch("http://localhost:3000/recipes");
-      const data = await response.json();
-      renderRecipes(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  getAllRecipes();
 
+  // Check if user is logged in
   if (!userData) {
     window.location.href = "/login.html";
   } else {
     const user = JSON.parse(userData);
-
     const welcomeMessage = document.getElementById("welcome-message");
     welcomeMessage.textContent = `Welcome, ${user.username}!`;
   }
+
+  // Fetch recipes after checking user login
+  getAllRecipes();
 });
 
 const logoutButton = document.getElementById("logout-btn");
@@ -27,12 +23,18 @@ logoutButton.addEventListener("click", () => {
   window.location.href = "/login.html";
 });
 
+// Function to fetch all recipes and render them
 async function getAllRecipes() {
   try {
     const response = await fetch("http://localhost:3000/recipes");
     const data = await response.json();
-    renderRecipes(data);
 
+    // Fetch favorite recipes after loading all recipes
+    const favRecipes = await getFavoriteRecipes(username);
+
+    renderRecipes(data, favRecipes);
+
+    // Add search functionality
     const searchInput = document.getElementById("search");
     searchInput.addEventListener("input", (event) => {
       const searchTerm = event.target.value.toLowerCase();
@@ -44,58 +46,79 @@ async function getAllRecipes() {
         const inUsername = recipe.username.toLowerCase().includes(searchTerm);
         return inTitle || inIngredients || inUsername;
       });
-      renderRecipes(filteredRecipes);
+      renderRecipes(filteredRecipes, favRecipes);
     });
-    console.log(data);
+
   } catch (error) {
-    console.log(error);
+    console.log("Error fetching recipes:", error);
   }
 }
-getAllRecipes();
 
-function renderRecipes(arr) {
+// Fetch favorite recipes for the logged-in user
+async function getFavoriteRecipes(username) {
+  try {
+    const response = await fetch(`http://localhost:3000/favorite/${username}`);
+    if (response.ok) {
+      return await response.json();
+    }
+    return [];
+  } catch (error) {
+    console.log("Error fetching favorite recipes:", error);
+    return [];
+  }
+}
+
+// Function to render recipes with heart icon for favorites
+async function renderRecipes(arr, favRecipes) {
   const recipeSection = document.getElementById("allrecipes");
   recipeSection.innerHTML = "";
+
   arr.forEach((recipe) => {
     const div = document.createElement("div");
     div.setAttribute("data-recipe-id", recipe.recipe_id);
     div.className = "onerecipe";
-    div.innerHTML = `<img src="${recipe.picture_url}" alt="picture">
-          <p>${recipe.title} by ${recipe.username}</p>
-          <a href="recipe.html?id=${recipe.recipe_id}">Link to the recipe</a>
-          <span class="like-heart" data-liked="false">&#9825;</span>
-          `;
+    div.innerHTML = `
+      <img src="${recipe.picture_url}" alt="picture">
+      <p>${recipe.title} by ${recipe.username}</p>
+      <a href="recipe.html?id=${recipe.recipe_id}">Link to the recipe</a>
+    `;
 
-    recipeSection.appendChild(div);
-
+    // Add vegan label if applicable
     if (recipe.is_vegan) {
       const vegan = document.createElement("p");
-      vegan.textContent = "Vegan";
+      vegan.textContent = "🌱 Vegan";
       div.appendChild(vegan);
     }
 
-    const heart = div.querySelector(".like-heart");
+    // Check if the recipe is a favorite
+    const isFavorite = favRecipes.some((favRecipe) => favRecipe.recipe_id == recipe.recipe_id);
+    const heart = document.createElement("span");
+    heart.className = 'like-heart';
+    heart.setAttribute('data-liked', isFavorite ? 'true' : 'false');
+    heart.textContent = isFavorite ? '❤️' : '♡';
+    div.appendChild(heart);
+
+    recipeSection.appendChild(div);
+
+    // Add event listener to heart icon
     heart.addEventListener("click", () => {
       const recipeId = div.getAttribute("data-recipe-id");
-      const username = localStorage.getItem("user")
-        ? JSON.parse(localStorage.getItem("user")).username
-        : null;
       const isLiked = heart.getAttribute("data-liked") === "true";
-      console.log("isliked", isLiked);
-      if (username) {
-        if (isLiked) {
-          removeFavorite(username, recipeId);
-        } else {
-          addFavorite(username, recipeId);
-        }
 
-        heart.setAttribute("data-liked", !isLiked);
-        heart.classList.toggle("liked");
+      if (isLiked) {
+        removeFavorite(username, recipeId);
+      } else {
+        addFavorite(username, recipeId);
       }
+
+      // Toggle the heart icon
+      heart.setAttribute("data-liked", !isLiked);
+      heart.textContent = isLiked ? '♡' : '❤️';
     });
   });
 }
 
+// Function to add a recipe to favorites
 async function addFavorite(username, recipe_id) {
   try {
     const response = await fetch("http://localhost:3000/favorite/add", {
@@ -116,21 +139,15 @@ async function addFavorite(username, recipe_id) {
   }
 }
 
+// Function to remove a recipe from favorites
 async function removeFavorite(username, recipe_id) {
   try {
-    const response = await fetch(
-      `http://localhost:3000/favorite/remove/${username}/${recipe_id}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          recipe_id: recipe_id,
-        }),
-      }
-    );
+    const response = await fetch(`http://localhost:3000/favorite/remove/${username}/${recipe_id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.ok) {
       console.log("Recipe removed from favorites");
     } else {
@@ -140,15 +157,3 @@ async function removeFavorite(username, recipe_id) {
     console.log("Error removing favorite:", error);
   }
 }
-document.addEventListener("DOMContentLoaded", () => {
-  const userData = localStorage.getItem("user");
-
-  if (!userData) {
-    window.location.href = "/login.html";
-  } else {
-    const user = JSON.parse(userData);
-
-    const welcomeMessage = document.getElementById("welcome-message");
-    welcomeMessage.textContent = `Welcome, ${user.username}!`;
-  }
-});
