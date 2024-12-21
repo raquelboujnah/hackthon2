@@ -5,6 +5,8 @@ const {
   postRecipeDB,
   updateRecipeDB,
   deleteRecipeDB,
+  getAllCategoriesDB,
+  getCategoriesByRecipeDB
 } = require("../models/recipeModel.js");
 
 const getAllRecipies = async (req, res) => {
@@ -90,6 +92,27 @@ const deleteRecipe = async (req, res) => {
   }
 };
 
+const getCategories = async (req, res) => {
+  try {
+    const response = await getAllCategoriesDB();
+    res.json(response);
+  } catch (error) {
+    console.log(error);
+    res.json({ message: "Internal Serveur Error" });
+  }
+}
+
+const getCategoriesByRecipe = async (req, res) => {
+  const {id} = req.params
+  try {
+    const response = await getCategoriesByRecipeDB(id);
+    res.json(response);
+  } catch (error) {
+    console.log(error);
+    res.json({ message: "Internal Serveur Error" });
+  }
+}
+
 module.exports = {
   getAllRecipies,
   getRecipesByUsername,
@@ -97,4 +120,6 @@ module.exports = {
   postRecipe,
   updateRecipe,
   deleteRecipe,
+  getCategories,
+  getCategoriesByRecipe
 };
