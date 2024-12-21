@@ -1,4 +1,4 @@
-const user = JSON.parse(localStorage.getItem('user'));
+const user = JSON.parse(localStorage.getItem("user"));
 const { username } = user;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -48,7 +48,6 @@ async function getAllRecipes() {
       });
       renderRecipes(filteredRecipes, favRecipes);
     });
-
   } catch (error) {
     console.log("Error fetching recipes:", error);
   }
@@ -80,7 +79,7 @@ async function renderRecipes(arr, favRecipes) {
     div.innerHTML = `
       <img src="${recipe.picture_url}" alt="picture">
       <p>${recipe.title} by ${recipe.username}</p>
-      <a href="recipe.html?id=${recipe.recipe_id}">Link to the recipe</a>
+      <a href="recipe.html?id=${recipe.recipe_id}">View the recipe</a>
     `;
 
     // Add vegan label if applicable
@@ -91,11 +90,13 @@ async function renderRecipes(arr, favRecipes) {
     }
 
     // Check if the recipe is a favorite
-    const isFavorite = favRecipes.some((favRecipe) => favRecipe.recipe_id == recipe.recipe_id);
+    const isFavorite = favRecipes.some(
+      (favRecipe) => favRecipe.recipe_id == recipe.recipe_id
+    );
     const heart = document.createElement("span");
-    heart.className = 'like-heart';
-    heart.setAttribute('data-liked', isFavorite ? 'true' : 'false');
-    heart.textContent = isFavorite ? '❤️' : '♡';
+    heart.className = "like-heart";
+    heart.setAttribute("data-liked", isFavorite ? "true" : "false");
+    heart.textContent = isFavorite ? "❤️" : "♡";
     div.appendChild(heart);
 
     recipeSection.appendChild(div);
@@ -113,7 +114,7 @@ async function renderRecipes(arr, favRecipes) {
 
       // Toggle the heart icon
       heart.setAttribute("data-liked", !isLiked);
-      heart.textContent = isLiked ? '♡' : '❤️';
+      heart.textContent = isLiked ? "♡" : "❤️";
     });
   });
 }
@@ -142,12 +143,15 @@ async function addFavorite(username, recipe_id) {
 // Function to remove a recipe from favorites
 async function removeFavorite(username, recipe_id) {
   try {
-    const response = await fetch(`http://localhost:3000/favorite/remove/${username}/${recipe_id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `http://localhost:3000/favorite/remove/${username}/${recipe_id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     if (response.ok) {
       console.log("Recipe removed from favorites");
     } else {
