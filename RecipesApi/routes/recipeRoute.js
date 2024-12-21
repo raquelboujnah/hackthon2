@@ -6,6 +6,9 @@ const {
   postRecipe,
   updateRecipe,
   deleteRecipe,
+  getCategories,
+  getCategoriesByRecipe,
+  getRecipesCategories
 } = require("../controllers/recipeController.js");
 
 const router = Router();
@@ -16,7 +19,9 @@ router.get("/recipe/:id", getRecipeByID);
 router.post("/", postRecipe);
 router.put("/", updateRecipe);
 router.delete("/:id", deleteRecipe);
-
+router.get('/all/categories', getCategories)
+router.get('/all/categories/:id', getCategoriesByRecipe)
+router.get ('/api/categories', getRecipesCategories)
 module.exports = {
     recipeRouter : router
 };

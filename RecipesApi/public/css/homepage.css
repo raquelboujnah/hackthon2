@@ -33,6 +33,7 @@ ul {
   margin: 0;
   padding: 0;
   width: 100%;
+  gap : 10px;
 }
 #navbar {
   background-color: #ffc0cb; /* Softer pink for a modern look */

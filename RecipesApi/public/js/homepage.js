@@ -1,8 +1,34 @@
 const user = JSON.parse(localStorage.getItem("user"));
 const { username } = user;
 
+let categoriesData = [];
+let recipeCategoriesData = [];
+let allRecipes = [];
+let favRecipes = [];
+
+const preloadCategories = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/recipes/all/categories"
+    );
+    categoriesData = await response.json();
+  } catch (error) {
+    console.error("Failed to fetch categories", error);
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:3000/recipes/api/categories"
+    );
+    recipeCategoriesData = await response.json();
+  } catch (error) {
+    console.error("Failed to fetch categories", error);
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const userData = localStorage.getItem("user");
+  preloadCategories();
 
   // Check if user is logged in
   if (!userData) {
@@ -23,37 +49,54 @@ logoutButton.addEventListener("click", () => {
   window.location.href = "/login.html";
 });
 
-// Function to fetch all recipes and render them
+const handleSearchInput = (event) => {
+  const searchTerm = event.target.value.toLowerCase();
+
+  const filteredRecipes = allRecipes.filter((recipe) => {
+    const inTitle = recipe.title.toLowerCase().includes(searchTerm);
+    const inIngredients = recipe.ingredients.some((ingredient) =>
+      ingredient.toLowerCase().includes(searchTerm)
+    );
+    const inUsername = recipe.username.toLowerCase().includes(searchTerm);
+
+    const recipeCategoryMappings = recipeCategoriesData.filter((rc) => {
+      return rc.recipe_id === recipe.recipe_id;
+    });
+
+    const linkedCategories = recipeCategoryMappings
+      .map((rc) => {
+        const category = categoriesData.find(
+          (cat) => cat.category_id === rc.category_id
+        );
+        return category ? category.name : null;
+      })
+      .filter(Boolean);
+
+    const inCategorie = linkedCategories.some((category) =>
+      category.toLowerCase().includes(searchTerm)
+    );
+
+    return inTitle || inIngredients || inUsername || inCategorie;
+  });
+
+  renderRecipes(filteredRecipes, favRecipes);
+};
+const searchInput = document.getElementById("search");
+searchInput.addEventListener("input", handleSearchInput);
+
 async function getAllRecipes() {
   try {
     const response = await fetch("http://localhost:3000/recipes");
-    const data = await response.json();
+    allRecipes = await response.json();
 
-    // Fetch favorite recipes after loading all recipes
-    const favRecipes = await getFavoriteRecipes(username);
+    favRecipes = await getFavoriteRecipes(username);
 
-    renderRecipes(data, favRecipes);
-
-    // Add search functionality
-    const searchInput = document.getElementById("search");
-    searchInput.addEventListener("input", (event) => {
-      const searchTerm = event.target.value.toLowerCase();
-      const filteredRecipes = data.filter((recipe) => {
-        const inTitle = recipe.title.toLowerCase().includes(searchTerm);
-        const inIngredients = recipe.ingredients.some((ingredient) =>
-          ingredient.toLowerCase().includes(searchTerm)
-        );
-        const inUsername = recipe.username.toLowerCase().includes(searchTerm);
-        return inTitle || inIngredients || inUsername;
-      });
-      renderRecipes(filteredRecipes, favRecipes);
-    });
+    renderRecipes(allRecipes, favRecipes);
   } catch (error) {
     console.log("Error fetching recipes:", error);
   }
 }
 
-// Fetch favorite recipes for the logged-in user
 async function getFavoriteRecipes(username) {
   try {
     const response = await fetch(`http://localhost:3000/favorite/${username}`);
@@ -81,6 +124,18 @@ async function renderRecipes(arr, favRecipes) {
       <p>${recipe.title} by ${recipe.username}</p>
       <a href="recipe.html?id=${recipe.recipe_id}">View the recipe</a>
     `;
+
+    const categorieUl = document.createElement("ul");
+    const categories = getCategoriesbyRecipeID(recipe.recipe_id).then(
+      (categorieArr) => {
+        categorieArr.forEach((categorie) => {
+          const li = document.createElement("li");
+          li.textContent = `${categorie.name}`;
+          categorieUl.appendChild(li);
+        });
+      }
+    );
+    div.appendChild(categorieUl);
 
     // Add vegan label if applicable
     if (recipe.is_vegan) {
@@ -159,5 +214,21 @@ async function removeFavorite(username, recipe_id) {
     }
   } catch (error) {
     console.log("Error removing favorite:", error);
+  }
+}
+
+async function getCategoriesbyRecipeID(id) {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/recipes/all/categories/${id}`
+    );
+    if (response.ok) {
+      const categories = await response.json();
+      return categories;
+    } else {
+      return { message: "Error during the getCategorie" };
+    }
+  } catch (error) {
+    console.log(error);
   }
 }

@@ -58,10 +58,30 @@ const deleteRecipeDB = (id) => {
     .returning('*')
 }
 
+const getAllCategoriesDB = () => {
+    return db('categories')
+    .select('category_id' , 'name')
+}
+
+const getCategoriesByRecipeDB = (id) => {
+    return db('recipe_categories as rc')
+    .join('categories as c', 'rc.category_id', 'c.category_id') 
+    .select('c.category_id', 'c.name') 
+    .where('rc.recipe_id', id); 
+}
+
+const getRecipesCategoriesDB = () => {
+    return db('recipe_categories')
+    .select('recipe_id', 'category_id')
+}
+
 module.exports = {getRecipesDB,
                 getRecipesByUsernameDB,
                 getRecipeByIDDB,
                 postRecipeDB,
                 updateRecipeDB,
-                deleteRecipeDB
+                deleteRecipeDB,
+                getAllCategoriesDB,
+                getCategoriesByRecipeDB,
+                getRecipesCategoriesDB
 }
