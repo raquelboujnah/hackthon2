@@ -21,19 +21,19 @@ body::before {
 
 .ingredient-input,
 .step-input {
-  width: 400px; /* Occupe toute la largeur disponible */
-  max-width: 500px; /* Limite la largeur maximale */
-  padding: 12px; /* Espacement interne pour un aspect plus agréable */
-  border-radius: 8px; /* Coins arrondis */
-  border: 1px solid #ccc; /* Bordure grise */
-  box-sizing: border-box; /* Inclut les bordures et le padding dans la largeur */
-  font-size: 16px; /* Taille de police */
+  width: 400px; 
+  max-width: 500px; 
+  padding: 12px; 
+  border-radius: 8px; 
+  border: 1px solid #ccc; 
+  box-sizing: border-box; 
+  font-size: 16px; 
 }
 
 .ingredient-input textarea,
 .step-input textarea {
-  resize: vertical; /* Permet de redimensionner verticalement */
-  min-height: 100px; /* Hauteur minimale pour les champs de texte */
+  resize: vertical; 
+  min-height: 100px; 
 }
 
 h1#usernameRecipe {
@@ -265,4 +265,9 @@ ul li .remove-step {
 
 #close-modal:hover {
   color: #ff8ca2;
+}
+
+#ingredients-list, #description-list{
+  display: flex;
+  flex-direction: column;
 }

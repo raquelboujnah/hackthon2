@@ -122,7 +122,7 @@ async function renderRecipes(arr, favRecipes) {
     div.innerHTML = `
       <img src="${recipe.picture_url}" alt="picture">
       <p>${recipe.title} by ${recipe.username}</p>
-      <a href="recipe.html?id=${recipe.recipe_id}">View the recipe</a>
+      <a href="recipe.html?id=${recipe.recipe_id}">View the recipe</a><br>
     `;
 
     const categorieUl = document.createElement("ul");

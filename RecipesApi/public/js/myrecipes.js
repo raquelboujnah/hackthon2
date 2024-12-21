@@ -89,7 +89,7 @@ function renderRecipes(arr) {
           <p>${recipe.title} by ${recipe.username}</p>
           <a href="recipe.html?id=${recipe.recipe_id}">Link to the recipe</a>
           <button class="update-button">Update</button>
-          <button class="delete-button">Delete</button>
+          <button class="delete-button">Delete</button><br>
           `;
 
     recipeSection.appendChild(div);
@@ -300,11 +300,11 @@ async function addRecipe(e) {
 
   const recipeData = {
     username,
-    title: formData.get("title"), // Use name="title" for the input
-    is_vegan: formData.get("is_vegan") === "true", // Use name="is_vegan"
-    picture_url: formData.get("picture_url"), // Use name="picture_url"
-    ingredients, // Processed from input fields
-    description: steps, // Processed from textareas
+    title: formData.get("title"), 
+    is_vegan: formData.get("is_vegan") === "true", 
+    picture_url: formData.get("picture_url"), 
+    ingredients, 
+    description: steps, 
   };
   console.log(JSON.stringify(recipeData));
   try {
