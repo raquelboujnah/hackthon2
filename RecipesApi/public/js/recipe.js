@@ -14,16 +14,32 @@ const getTheRecipe = async () => {
   }
 };
 
+async function getCategoriesbyRecipeID (id){
+  try {
+    const response = await fetch (`http://localhost:3000/recipes/all/categories/${id}`)
+    if(response.ok){
+      const categories = await response.json()
+      return categories
+    }else {
+      return {message : 'Error during the getCategorie'}
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 function displayRecipe(recipe) {
   const recipeSection = document.getElementById("recipe");
   recipeSection.innerHTML = `
     <h1>${recipe.title}</h1>
         <img src="${recipe.picture_url}" alt="${recipe.title}">
+        <ul id='categories'></ul>
         <h3>Ingredients:</h3>
         <ul id="ingredients-list"></ul>
         <h3>Instructions:</h3>
         <ol id="instructions-list"></ol>
         `;
+    
 
   const ingredientsList = document.getElementById("ingredients-list");
   recipe.ingredients.forEach((ingredient) => {
@@ -38,6 +54,18 @@ function displayRecipe(recipe) {
     li.textContent = step;
     instructionsList.appendChild(li);
   });
+
+  const categorieUL = document.getElementById('categories')
+  const categories = getCategoriesbyRecipeID(recipe.recipe_id)
+    .then(categorieArr => {
+      categorieArr.forEach(categorie => {
+        const li = document.createElement('li')
+        li.textContent = `${categorie.name}` 
+        categorieUL.appendChild(li)
+      })
+      
+    })
+    recipeSection.appendChild(categorieUl)
 }
 
 getTheRecipe();

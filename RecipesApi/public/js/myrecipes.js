@@ -1,14 +1,36 @@
 const user = JSON.parse(localStorage.getItem('user'))
 const {username, user_id, first_name} = user
+let categoriesData = [];
+let recipeCategoriesData = [];
+let userRecipes = [];
 
 const usernameRecipe = document.getElementById('usernameRecipe')
 usernameRecipe.textContent = `${first_name}'s recipes`
 
+const preloadCategories = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/recipes/all/categories'); 
+      categoriesData = await response.json();
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    }
+  
+    try {
+      const response = await fetch('http://localhost:3000/recipes/api/categories'); 
+      recipeCategoriesData = await response.json();
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    }
+  
+  
+  };
+preloadCategories()
+
 async function getRecipeByUsername () {
     try {
         const response = await fetch (`http://localhost:3000/recipes/${username}`)
-        const data = await response.json()
-        renderRecipes(data)
+        userRecipes = await response.json()
+        renderRecipes(userRecipes)
     } catch (error) {
         console.log(error)
     }
@@ -16,8 +38,45 @@ async function getRecipeByUsername () {
 
 getRecipeByUsername()
 
+
+
+const handleSearchInput = (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+  
+    const filteredRecipes = userRecipes.filter((recipe) => {
+      const inTitle = recipe.title.toLowerCase().includes(searchTerm);
+      const inIngredients = recipe.ingredients.some((ingredient) =>
+        ingredient.toLowerCase().includes(searchTerm)
+      );
+      const inUsername = recipe.username.toLowerCase().includes(searchTerm);
+  
+      // Filter and map categories for the recipe
+      const recipeCategoryMappings = recipeCategoriesData.filter((rc) => {
+        return rc.recipe_id === recipe.recipe_id;
+      });
+  
+      const linkedCategories = recipeCategoryMappings.map((rc) => {
+        const category = categoriesData.find((cat) => cat.category_id === rc.category_id);
+        return category ? category.name : null;
+      }).filter(Boolean); // Remove null values
+  
+      // Check if any linked category matches the search term
+      const inCategorie = linkedCategories.some((category) =>
+        category.toLowerCase().includes(searchTerm)
+      );
+  
+      return inTitle || inIngredients || inUsername || inCategorie;
+    });
+  
+    renderRecipes(filteredRecipes);
+  };
+
+const searchInput = document.getElementById("search");
+searchInput.addEventListener("input", handleSearchInput);
+
 function renderRecipes(arr){
     const recipeSection = document.getElementById('userrecipes')
+    recipeSection.innerHTML = ''
     arr.forEach(recipe => {
         const div = document.createElement ('div')
         div.setAttribute('data-recipe-id', recipe.recipe_id)
@@ -31,6 +90,18 @@ function renderRecipes(arr){
           `
         
         recipeSection.appendChild(div)
+
+        const categorieUl = document.createElement('ul')
+        const categories = getCategoriesbyRecipeID(recipe.recipe_id)
+        .then(categorieArr => {
+          categorieArr.forEach(categorie => {
+            const li = document.createElement('li')
+            li.textContent = `${categorie.name}` 
+            categorieUl.appendChild(li)
+          })
+          
+        })
+        div.appendChild(categorieUl)
 
         if(recipe.is_vegan){
             const vegan = document.createElement('p')
@@ -285,3 +356,17 @@ async function deleteRecipe(id){
         console.log(error)
     }
 }
+
+async function getCategoriesbyRecipeID (id){
+    try {
+      const response = await fetch (`http://localhost:3000/recipes/all/categories/${id}`)
+      if(response.ok){
+        const categories = await response.json()
+        return categories
+      }else {
+        return {message : 'Error during the getCategorie'}
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }

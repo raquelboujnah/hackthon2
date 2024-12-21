@@ -70,6 +70,11 @@ const getCategoriesByRecipeDB = (id) => {
     .where('rc.recipe_id', id); 
 }
 
+const getRecipesCategoriesDB = () => {
+    return db('recipe_categories')
+    .select('recipe_id', 'category_id')
+}
+
 module.exports = {getRecipesDB,
                 getRecipesByUsernameDB,
                 getRecipeByIDDB,
@@ -77,5 +82,6 @@ module.exports = {getRecipesDB,
                 updateRecipeDB,
                 deleteRecipeDB,
                 getAllCategoriesDB,
-                getCategoriesByRecipeDB
+                getCategoriesByRecipeDB,
+                getRecipesCategoriesDB
 }

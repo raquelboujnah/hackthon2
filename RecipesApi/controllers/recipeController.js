@@ -6,7 +6,8 @@ const {
   updateRecipeDB,
   deleteRecipeDB,
   getAllCategoriesDB,
-  getCategoriesByRecipeDB
+  getCategoriesByRecipeDB,
+  getRecipesCategoriesDB
 } = require("../models/recipeModel.js");
 
 const getAllRecipies = async (req, res) => {
@@ -113,6 +114,16 @@ const getCategoriesByRecipe = async (req, res) => {
   }
 }
 
+const getRecipesCategories = async (req, res) => {
+  try {
+    const response = await getRecipesCategoriesDB();
+    res.json(response);
+  } catch (error) {
+    console.log(error);
+    res.json({ message: "Internal Serveur Error" });
+  }
+}
+
 module.exports = {
   getAllRecipies,
   getRecipesByUsername,
@@ -121,5 +132,6 @@ module.exports = {
   updateRecipe,
   deleteRecipe,
   getCategories,
-  getCategoriesByRecipe
+  getCategoriesByRecipe,
+  getRecipesCategories
 };

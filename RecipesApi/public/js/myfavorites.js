@@ -30,6 +30,18 @@ function renderRecipes(arr){
               `;
     
         recipeSection.appendChild(div);
+
+        const categorieUl = document.createElement('ul')
+        const categories = getCategoriesbyRecipeID(recipe.recipe_id)
+        .then(categorieArr => {
+          categorieArr.forEach(categorie => {
+            const li = document.createElement('li')
+            li.textContent = `${categorie.name}` 
+            categorieUl.appendChild(li)
+          })
+          
+        })
+        div.appendChild(categorieUl)
     
         if (recipe.is_vegan) {
           const vegan = document.createElement("p");
@@ -105,3 +117,18 @@ async function addFavorite(username, recipe_id) {
       console.log("Error removing favorite:", error);
     }
   }
+
+
+async function getCategoriesbyRecipeID (id){
+  try {
+    const response = await fetch (`http://localhost:3000/recipes/all/categories/${id}`)
+    if(response.ok){
+      const categories = await response.json()
+      return categories
+    }else {
+      return {message : 'Error during the getCategorie'}
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
