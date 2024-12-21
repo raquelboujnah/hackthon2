@@ -6,7 +6,7 @@ let recipeCategoriesData = [];
 let allRecipes = [];
 let favRecipes = [];
 
-// Fetch categories for all recipes when the page loads
+
 const preloadCategories = async () => {
   try {
     const response = await fetch('http://localhost:3000/recipes/all/categories'); 
@@ -54,13 +54,14 @@ const handleSearchInput = (event) => {
   const searchTerm = event.target.value.toLowerCase();
 
   const filteredRecipes = allRecipes.filter((recipe) => {
+
     const inTitle = recipe.title.toLowerCase().includes(searchTerm);
     const inIngredients = recipe.ingredients.some((ingredient) =>
       ingredient.toLowerCase().includes(searchTerm)
     );
     const inUsername = recipe.username.toLowerCase().includes(searchTerm);
 
-    // Filter and map categories for the recipe
+    
     const recipeCategoryMappings = recipeCategoriesData.filter((rc) => {
       return rc.recipe_id === recipe.recipe_id;
     });
@@ -68,9 +69,9 @@ const handleSearchInput = (event) => {
     const linkedCategories = recipeCategoryMappings.map((rc) => {
       const category = categoriesData.find((cat) => cat.category_id === rc.category_id);
       return category ? category.name : null;
-    }).filter(Boolean); // Remove null values
+    }).filter(Boolean);
 
-    // Check if any linked category matches the search term
+    
     const inCategorie = linkedCategories.some((category) =>
       category.toLowerCase().includes(searchTerm)
     );
@@ -80,28 +81,26 @@ const handleSearchInput = (event) => {
 
   renderRecipes(filteredRecipes, favRecipes);
 };
+const searchInput = document.getElementById("search");
+searchInput.addEventListener("input", handleSearchInput);
 
-// Function to fetch all recipes and favorites
+
 async function getAllRecipes() {
   try {
     const response = await fetch("http://localhost:3000/recipes");
     allRecipes = await response.json();
 
-    // Fetch favorite recipes after loading all recipes
+    
     favRecipes = await getFavoriteRecipes(username);
 
     renderRecipes(allRecipes, favRecipes);
-
-    // Attach search input listener (separate from fetching)
-    const searchInput = document.getElementById("search");
-    searchInput.addEventListener("input", handleSearchInput);
 
   } catch (error) {
     console.log("Error fetching recipes:", error);
   }
 }
 
-// Fetch favorite recipes for the logged-in user
+
 async function getFavoriteRecipes(username) {
   try {
     const response = await fetch(`http://localhost:3000/favorite/${username}`);

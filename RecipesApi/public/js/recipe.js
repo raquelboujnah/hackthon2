@@ -65,7 +65,6 @@ function displayRecipe(recipe) {
       })
       
     })
-    recipeSection.appendChild(categorieUl)
 }
 
 getTheRecipe();

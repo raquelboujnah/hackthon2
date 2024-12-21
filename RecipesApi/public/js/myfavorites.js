@@ -3,6 +3,62 @@ const {username, user_id, first_name} = user
 
 const usernameRecipe = document.getElementById('usernameFavorites')
 usernameRecipe.textContent = `${first_name}'s favorites`
+let favRecipes=[];
+let categoriesData = [];
+let recipeCategoriesData = [];
+
+const preloadCategories = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/recipes/all/categories'); 
+    categoriesData = await response.json();
+  } catch (error) {
+    console.error("Failed to fetch categories", error);
+  }
+
+  try {
+    const response = await fetch('http://localhost:3000/recipes/api/categories'); 
+    recipeCategoriesData = await response.json();
+  } catch (error) {
+    console.error("Failed to fetch categories", error);
+  }
+
+
+};
+preloadCategories()
+
+const handleSearchInput = (event) => {
+  const searchTerm = event.target.value.toLowerCase();
+
+  const filteredRecipes = favRecipes.filter((recipe) => {
+    const inTitle = recipe.title.toLowerCase().includes(searchTerm);
+    const inIngredients = recipe.ingredients.some((ingredient) =>
+      ingredient.toLowerCase().includes(searchTerm)
+    );
+    const inUsername = recipe.username.toLowerCase().includes(searchTerm);
+
+    // Filter and map categories for the recipe
+    const recipeCategoryMappings = recipeCategoriesData.filter((rc) => {
+      return rc.recipe_id === recipe.recipe_id;
+    });
+
+    const linkedCategories = recipeCategoryMappings.map((rc) => {
+      const category = categoriesData.find((cat) => cat.category_id === rc.category_id);
+      return category ? category.name : null;
+    }).filter(Boolean); // Remove null values
+
+    // Check if any linked category matches the search term
+    const inCategorie = linkedCategories.some((category) =>
+      category.toLowerCase().includes(searchTerm)
+    );
+
+    return inTitle || inIngredients || inUsername || inCategorie;
+  });
+
+  renderRecipes(filteredRecipes, favRecipes);
+};
+
+const searchInput = document.getElementById("search");
+searchInput.addEventListener("input", handleSearchInput);
 
 async function getUserFavorites () {
     try {
@@ -19,6 +75,7 @@ getUserFavorites()
 
 function renderRecipes(arr){
     const recipeSection = document.getElementById('allfavorites')
+    recipeSection.innerHTML= ''
     arr.forEach((recipe) => {
         const div = document.createElement("div");
         div.setAttribute("data-recipe-id", recipe.recipe_id);
